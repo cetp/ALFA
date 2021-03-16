@@ -1,0 +1,22 @@
+
+{
+
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "alfa",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "args": ["estimate", 
+                "\"~\\OneDrive - University of New England\\Documents\\raw\"", 
+                "--threshold", "120", 
+                "--cut_off","10000", 
+                "--output_dir", "\".\\extdata\\testing\"",
+                "--workers","4", 
+                "--combine", 
+                "--csv","test.csv",
+        },
+    ]
+}

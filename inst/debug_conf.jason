@@ -1,0 +1,46 @@
+{
+
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "alfa",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "args": ["estimate", 
+                "\"~\\OneDrive - University of New England\\Documents\\raw\"", 
+                "--threshold", "120", 
+                "--cut_off","10000", 
+                "--output_dir", "\".\\extdata\\testing\"",
+                "--workers","2", 
+                "--csv","test.csv"
+            ]
+        },
+        
+    ]
+}
+
+{
+
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "alfa",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "args": ["preprocess", 
+                "\"~\\OneDrive - University of New England\\Documents\\raw\"", 
+                "--output_dir", "\".\\extdata\\testing\"",
+                "--workers","2", 
+                "--crop","300", 
+                "--mask_pixels","500", 
+                "--mask_offset_x","0", 
+                "--mask_offset_y","2300",
+            ]
+        },
+        
+    ]
+}
