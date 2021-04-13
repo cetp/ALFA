@@ -68,8 +68,12 @@ class ALFA:
             # read the image resolution
             if not self.res:
                 with open(os.path.expanduser(img), 'rb') as image_meta:
-                    metadata = ef.Image(image_meta)
-                if (not metadata.has_exif) or not(hasattr(metadata, 'x_resolution') or (hasattr(metadata, 'Xresolution'))  or hasattr(metadata, 'Xresolution')):
+                    try:
+                        metadata = ef.Image(image_meta)
+                    except:
+                        return pd.DataFrame(data={'filename': [img], 'Area': None, 'Error' : 'Unable to access EXIF Data for image'})
+
+                if (not metadata.has_exif) or not(hasattr(metadata, 'x_resolution') or hasattr(metadata, 'Xresolution')):
                     #raise ValueError("Image of unknown resolution. Please specify the res argument in dpi.")
                     return pd.DataFrame(data={'filename': [img], 'Area': None, 'Error' : 'Image of unknown resolution. Please specify the res argument in dpi.'})
                 
@@ -94,14 +98,22 @@ class ALFA:
                         self.res = metadata.XResolution
 
             # read the scan
-            scan = cv2.imread(os.path.expanduser(img))
+            try:
+                scan = cv2.imread(os.path.expanduser(img))
+            except:
+                return pd.DataFrame(data={'filename': [img], 'Area': None, 'Error' : 'Unable to open image for processing. Check the file format.'})
+        
+            if scan is None:
+                return pd.DataFrame(data={'filename': [img], 'Area': None, 'Error' : 'Unable to open image for processing. Check the file format.'})
 
             # transfer to grayscale
             scan = cv2.cvtColor(scan, cv2.COLOR_BGR2GRAY)
 
             # classify leaf and background
             if self.threshold < 0 or self.threshold > 255:
-                raise ValueError("Threshold must be an integer between 0 and 255.")
+                #raise ValueError("Threshold must be an integer between 0 and 255.")
+                return pd.DataFrame(data={'filename': [img], 'Area': None, 'Error' : 'Error: Threshold must be an integer between 0 and 255.'})
+
             scan = cv2.threshold(scan, self.threshold, 255, cv2.THRESH_BINARY_INV)[1]
 
             # label leaflets
@@ -174,28 +186,43 @@ class ALFA:
                 os.makedirs(output_dir)
 
             if os.path.split(os.path.abspath(os.path.expanduser(img)))[0] == self.output_dir:
-                raise ValueError(
-                    'You have provided identical paths for the source and destination images.' +
-                    'This would cause your file to be overwritten. Execution has been halted.')
+                #raise ValueError(
+                #    'You have provided identical paths for the source and destination images.' +
+                #    'This would cause your file to be overwritten. Execution has been halted.')
+                return pd.DataFrame(data={'filename': [img], 'Pre-process Result' : 'Error: You have provided identical paths for the source and destination image'})
             # read the image
-            scan = cv2.imread(os.path.abspath(os.path.expanduser(img)))
+            try:
+                scan = cv2.imread(os.path.abspath(os.path.expanduser(img)))
+            except:
+                return pd.DataFrame(data={'filename': [img], 'Pre-process Result' : 'Error: Unable to open source file'})
+
+            #Check for error state
+            if scan is None:
+                return pd.DataFrame(data={'filename': [img], 'Pre-process Result' : 'Error: Unable to open source file'})
+
+
             dims = scan.shape
 
             # crop the edges
             if self.crop:
                 if self.crop < 0:
                     #print(f'You have attempted to crop a negative number of pixels.')
-                    raise ValueError('You have attempted to crop a negative number of pixels.')
+                    #raise ValueError('You have attempted to crop a negative number of pixels.')
+                    return pd.DataFrame(data={'filename': [img], 'Pre-process Result' : 'Error: You have attempted to crop a negative number of pixels.'})
                 if self.crop > dims[0] or self.crop > dims[1]:
-                    raise ValueError('You have attempted to crop away more pixels than are available in the image.')
+                    #raise ValueError('You have attempted to crop away more pixels than are available in the image.')
+                    return pd.DataFrame(data={'filename': [img], 'Pre-process Result' : 'Error: You have attempted to crop away more pixels than are available in the image.'})
                 scan = scan[self.crop:dims[0] - self.crop, self.crop:dims[1] - self.crop]
 
             # mask scale
             if self.mask_pixels:
                 if self.mask_offset_y < 0 or self.mask_offset_x < 0 or self.mask_pixels < 0:
-                    raise ValueError("You have attempted to mask a negative number of pixels.")
+                    #raise ValueError("You have attempted to mask a negative number of pixels.")
+                    return pd.DataFrame(data={'filename': [img], 'Pre-process Result' : 'Error: You have attempted to mask a negative number of pixels.'})
+
                 if self.mask_offset_y + self.mask_pixels > dims[0] or self.mask_offset_x + self.mask_pixels > dims[1]:
-                    raise ValueError("You have attempted to mask more pixels than are available in the image.")
+                    #raise ValueError("You have attempted to mask more pixels than are available in the image.")
+                    return pd.DataFrame(data={'filename': [img], 'Pre-process Result' : 'Error: You have attempted to mask more pixels than are available in the image.'})
 
                 scan[self.mask_offset_y:self.mask_offset_y + self.mask_pixels,
                      self.mask_offset_x:self.mask_offset_x + self.mask_pixels,
@@ -210,7 +237,8 @@ class ALFA:
             # add scale
             if self.red_scale:
                 if self.red_scale_pixels > dims[0] or self.red_scale_pixels > dims[1]:
-                    raise ValueError("You have attempted to place a scale bar beyond the margins of the image.")
+                    #raise ValueError("You have attempted to place a scale bar beyond the margins of the image.")
+                    return pd.DataFrame(data={'filename': [img], 'Pre-process Result' : 'Error: You have attempted to place a scale bar beyond the margins of the image'})
                 scan[0:self.red_scale_pixels, 0:self.red_scale_pixels, 0] = 0  # b channel
                 scan[0:self.red_scale_pixels, 0:self.red_scale_pixels, 1] = 0  # g channel
                 scan[0:self.red_scale_pixels, 0:self.red_scale_pixels, 2] = 255  # red channel
@@ -221,8 +249,29 @@ class ALFA:
             file_name = os.path.join(os.path.abspath(os.path.expanduser(self.output_dir)), file_name)
 
             # save as jpg
+            try:
+                metadata = ef.Image(os.path.abspath(os.path.expanduser(img)))
+            except:
+                #Image write failure
+                cv2.imwrite(file_name, scan)
+                return pd.DataFrame(data={'filename': [img], 'Pre-process Result' : 'EXIF data could not be loaded from source image.'})
+
+            #Create the processed image (even if EXIF data isn't viable)
             cv2.imwrite(file_name, scan)
-            piexif.transplant(os.path.abspath(os.path.expanduser(img)), file_name)
+            
+            if (not metadata.has_exif) or not(hasattr(metadata, 'x_resolution') or hasattr(metadata, 'Xresolution')  or hasattr(metadata, 'Xresolution')):
+                # EXIF has no resolution data present
+                return pd.DataFrame(data={'filename': [img], 'Pre-process Result' : 'EXIF Resolution Data Not transferred to Pre-processed image.'})
+            else:
+                try:
+                    piexif.transplant(os.path.abspath(os.path.expanduser(img)), file_name)
+                except:
+                    #Return a data frame to the caller to indicate success 
+                    return pd.DataFrame(data={'filename': [img], 'Pre-process Result' : 'Unable to copy EXIF data to processed image.'})
+
+                #Return a data frame to the caller to indicate success 
+                return pd.DataFrame(data={'filename': [img], 'Pre-process Result' : 'No Error'})
+                
 
         elif os.path.isdir(os.path.abspath(os.path.expanduser(img))):
             images = os.listdir(os.path.abspath(os.path.expanduser(img)))
@@ -230,11 +279,15 @@ class ALFA:
 
             # create a workers pool and start processing
             pool = multiprocessing.Pool(self.workers)
-            pool.map_async(self.preprocess, images)
+            results = pool.map(self.preprocess, images)
             pool.close()
             pool.join()
+
+            return pd.concat(results)
         else:
-            raise ValueError(f'Your input {img} needs to be either a file or a directory')
+            os.rmdir(output_dir)
+            return pd.DataFrame(data={'filename': [img], 'Pre-process Result' : 'Unable to open file or directory'})
+            #raise ValueError(f'Your input {img} needs to be either a file or a directory')
     
     
     def resolution_sort_image_files(self,the_dir='./'):
@@ -247,23 +300,34 @@ class ALFA:
                     with open(current_file_path, 'rb') as image_meta:
                         # Sort by resolution
                         # Check if we are working with an image file with exif information
-                        # We will not touch the file if it doesn't have enough info.
-                        metadata = ef.Image(image_meta)
-                        if  metadata.has_exif:
-                            if hasattr(metadata, 'x_resolution'): 
-                                dir_name = 'resolution_'+str(round(metadata.x_resolution))
-                                dir_name = os.path.abspath(os.path.join(the_dir,dir_name))
+                        try: 
+                            metadata = ef.Image(image_meta)
+                            if  metadata.has_exif:
+                                #EXIF Resolution variants
+                                if hasattr(metadata, 'x_resolution'): 
+                                    dir_name = 'resolution_'+str(round(metadata.x_resolution))
+                                elif hasattr(metadata, 'Xresolution'):
+                                    dir_name = 'resolution_'+str(round(metadata.Xresolution))
+                                else:
+                                    #EXIF with no recognised resolution attribute
+                                    dir_name = 'resolution_NA'
                             else:
-                                dir_name = 'resolution_NA'
-                                dir_name = os.path.abspath(os.path.join(the_dir,dir_name))
-                            if not(os.path.exists(dir_name) & isdir(dir_name)):
-                                # Create the directory for the resolution
-                                os.mkdir(dir_name)
-                                
-                            # Move the image to the directory 
-                            new_file_path = os.path.abspath(dir_name+'/'+curent_file)
-                            image_meta.close()
-                            shutil.move(current_file_path, new_file_path)
+                                #No reported EXIF on file
+                                dir_name = 'resolution_NA'         
+                        except:
+                            #Unaccessible EXIF or different file type
+                            dir_name = 'resolution_NA'
+
+                        dir_name = os.path.abspath(os.path.join(the_dir,dir_name))
+                        if not(os.path.exists(dir_name) & isdir(dir_name)):
+                            # Create the directory for the resolution
+                            os.mkdir(dir_name)
+                            
+                        # Move the image to the directory 
+                        new_file_path = os.path.abspath(dir_name+'/'+current_file)
+                        image_meta.close()
+                        shutil.move(current_file_path, new_file_path)
+
         else:
             raise ValueError('Could not find directory to sort')
 
@@ -273,10 +337,11 @@ class ALFA:
             file_list = [f for f in listdir(the_dir) if isfile(join(the_dir, f))]
             cur_file_count = 0
             dir_count = 1
-            new_dir_name = os.path.join(the_dir,'images_')
+            new_dir_name = os.path.join(the_dir,'images_'+str(dir_count))
             if len(file_list) > 0:
                 if not (os.path.exists(new_dir_name)):
                     os.mkdir(new_dir_name)
+                    dir_count = dir_count + 1
 
             for curent_file in file_list:
                 current_file_path = os.path.join(the_dir,curent_file)
@@ -322,7 +387,7 @@ pre_processing_parser.add_argument("--mask_offset_x", type=int, default=0,
 pre_processing_parser.add_argument("--mask_offset_y", type=int, default=0,
                                    help="Offset for positioning the masking window in number of pixels from top to "
                                         "bottom of the image")
-
+pre_processing_parser.add_argument('--csv', type=str, help='name of output csv (to be saved in pwd)')
 
 estimate_parser = subparsers.add_parser('estimate', help='Assess images of leaves to determine their areas.')
 estimate_parser.add_argument("-t", "--threshold", type=int, default=120,
@@ -368,6 +433,12 @@ if __name__ == '__main__':
     if args.command == 'estimate':
         if args.output_dir:
             output_dir = os.path.abspath(os.path.expanduser(args.output_dir))
+           
+            if os.path.split(os.path.abspath(os.path.expanduser(args.input)))[0] == output_dir:
+                raise NameError(
+                    'You have provided identical paths for the source and destination directories. '
+                    'This would cause your files to be overwritten. Execution has been halted. ')
+            
             estimator.output_dir = output_dir
             if not os.path.exists(output_dir):
                 os.makedirs(output_dir)
@@ -375,12 +446,6 @@ if __name__ == '__main__':
             else:
                 raise NameError("Output directory already exists. Output files may overwrite existing files. "
                                 "Please choose a different output directory.")
-
-            if os.path.split(os.path.abspath(os.path.expanduser(args.input)))[0] == output_dir:
-                raise NameError(
-                    'You have provided identical paths for the source and destination directories. '
-                    'This would cause your files to be overwritten. Execution has been halted. ')
-
         estimator.res = args.res
         estimator.workers = args.workers
         estimator.combine = args.combine
@@ -392,6 +457,13 @@ if __name__ == '__main__':
         print(output.to_csv(sep=',')) #quoting=csv.QUOTE_NONE)
         if args.csv:
             output.to_csv(args.csv)
+
+        #Check that there actually were some images sucessfully processed.
+        #If not, delete the the output directory.
+        file_list = [f for f in listdir(output_dir) if isfile(join(output_dir, f))]
+        if len(file_list) == 0:
+            os.rmdir(output_dir)
+
 
     elif args.command == 'preprocess':
         output_dir = os.path.abspath(os.path.expanduser(args.output_dir))
@@ -416,7 +488,17 @@ if __name__ == '__main__':
         estimator.mask_offset_y = args.mask_offset_y
         estimator.workers = args.workers
 
-        estimator.preprocess(args.input)
+        output =  estimator.preprocess(args.input)
+        print('###Data###')
+        print(output.to_csv(sep=',')) #quoting=csv.QUOTE_NONE)
+        if args.csv:
+            output.to_csv(os.path.join(output_dir,args.csv))
+
+        #Check that there actually were some images sucessfully processed.
+        #If not, delete the the output directory.
+        file_list = [f for f in listdir(output_dir) if isfile(join(output_dir, f))]
+        if len(file_list) == 0:
+            os.rmdir(output_dir)
 
     elif args.command == 'resolution_sort':
         estimator.resolution_sort_image_files(args.input)
