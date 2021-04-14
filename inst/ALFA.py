@@ -71,7 +71,7 @@ class ALFA:
                     try:
                         metadata = ef.Image(image_meta)
                     except:
-                        return pd.DataFrame(data={'filename': [img], 'Area': None, 'Error' : 'Unable to access EXIF Data for image'})
+                        return pd.DataFrame(data={'filename': [img], 'Area': None, 'Error' : 'Unable to access EXIF Data for image.'})
 
                 if (not metadata.has_exif) or not(hasattr(metadata, 'x_resolution') or hasattr(metadata, 'Xresolution')):
                     #raise ValueError("Image of unknown resolution. Please specify the res argument in dpi.")
@@ -189,16 +189,16 @@ class ALFA:
                 #raise ValueError(
                 #    'You have provided identical paths for the source and destination images.' +
                 #    'This would cause your file to be overwritten. Execution has been halted.')
-                return pd.DataFrame(data={'filename': [img], 'Pre-process Result' : 'Error: You have provided identical paths for the source and destination image'})
+                return pd.DataFrame(data={'filename': [img], 'Pre-process Result' : 'Error: You have provided identical paths for the source and destination image.'})
             # read the image
             try:
                 scan = cv2.imread(os.path.abspath(os.path.expanduser(img)))
             except:
-                return pd.DataFrame(data={'filename': [img], 'Pre-process Result' : 'Error: Unable to open source file'})
+                return pd.DataFrame(data={'filename': [img], 'Pre-process Result' : 'Error: Unable to open source file.'})
 
             #Check for error state
             if scan is None:
-                return pd.DataFrame(data={'filename': [img], 'Pre-process Result' : 'Error: Unable to open source file'})
+                return pd.DataFrame(data={'filename': [img], 'Pre-process Result' : 'Error: Unable to open source file.'})
 
 
             dims = scan.shape
@@ -238,7 +238,7 @@ class ALFA:
             if self.red_scale:
                 if self.red_scale_pixels > dims[0] or self.red_scale_pixels > dims[1]:
                     #raise ValueError("You have attempted to place a scale bar beyond the margins of the image.")
-                    return pd.DataFrame(data={'filename': [img], 'Pre-process Result' : 'Error: You have attempted to place a scale bar beyond the margins of the image'})
+                    return pd.DataFrame(data={'filename': [img], 'Pre-process Result' : 'Error: You have attempted to place a scale bar beyond the margins of the image.'})
                 scan[0:self.red_scale_pixels, 0:self.red_scale_pixels, 0] = 0  # b channel
                 scan[0:self.red_scale_pixels, 0:self.red_scale_pixels, 1] = 0  # g channel
                 scan[0:self.red_scale_pixels, 0:self.red_scale_pixels, 2] = 255  # red channel
@@ -254,20 +254,20 @@ class ALFA:
             except:
                 #Image write failure
                 cv2.imwrite(file_name, scan)
-                return pd.DataFrame(data={'filename': [img], 'Pre-process Result' : 'EXIF data could not be loaded from source image.'})
+                return pd.DataFrame(data={'filename': [img], 'Pre-process Result' : 'Error: EXIF data could not be loaded from source image.'})
 
             #Create the processed image (even if EXIF data isn't viable)
             cv2.imwrite(file_name, scan)
             
             if (not metadata.has_exif) or not(hasattr(metadata, 'x_resolution') or hasattr(metadata, 'Xresolution')  or hasattr(metadata, 'Xresolution')):
                 # EXIF has no resolution data present
-                return pd.DataFrame(data={'filename': [img], 'Pre-process Result' : 'EXIF Resolution Data Not transferred to Pre-processed image.'})
+                return pd.DataFrame(data={'filename': [img], 'Pre-process Result' : 'Error: EXIF Resolution Data Not transferred to Pre-processed image.'})
             else:
                 try:
                     piexif.transplant(os.path.abspath(os.path.expanduser(img)), file_name)
                 except:
                     #Return a data frame to the caller to indicate success 
-                    return pd.DataFrame(data={'filename': [img], 'Pre-process Result' : 'Unable to copy EXIF data to processed image.'})
+                    return pd.DataFrame(data={'filename': [img], 'Pre-process Result' : 'Error: Unable to copy EXIF data to processed image.'})
 
                 #Return a data frame to the caller to indicate success 
                 return pd.DataFrame(data={'filename': [img], 'Pre-process Result' : 'No Error'})
@@ -286,7 +286,7 @@ class ALFA:
             return pd.concat(results)
         else:
             os.rmdir(output_dir)
-            return pd.DataFrame(data={'filename': [img], 'Pre-process Result' : 'Unable to open file or directory'})
+            return pd.DataFrame(data={'filename': [img], 'Pre-process Result' : 'Unable to open file or directory.'})
             #raise ValueError(f'Your input {img} needs to be either a file or a directory')
     
     

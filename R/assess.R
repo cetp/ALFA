@@ -30,33 +30,36 @@
 assess <- function(source, threshold = 120, cut_off = 10000, output_dir = NULL, combine = FALSE, res = NULL, workers = NULL) {
   path_to_python <- python_version()
   path_to_script <- paste(system.file(package="ALFA"), "ALFA.py", sep="/")
-
+  
   args <- paste(shQuote(path_to_script), "estimate", shQuote(source), "--threshold", threshold, "--cut_off", cut_off)
   if(!is.null(output_dir)){args <- paste(args, "--output_dir", shQuote(output_dir))}
   if(!is.null(res)){args <- paste(args, "--res", shQuote(res))}
   if(combine){args <- paste(args, "--combine")}
   if(!is.null(workers)){args <- paste(args, "--workers", workers)}
-
+  
   out <- system2(command = path_to_python, args = args, stdout = TRUE)
-
-  #If we have some data returned by Python, then process it
-  if (any(grepl("^directory", out))){
-    out <- out[-grep("^directory", out)] # drop announcement about a directory being created.
+  if(length('out') > 0){
+    #If we have some data returned by Python, then process it
+    if (any(grepl("^directory", out))){
+      out <- out[-grep("^directory", out)] # drop announcement about a directory being created.
+    }
+    if (any(grepl("^###", out))){
+      out <- out[-grep("###Data###", out)] # drop the ###Data### marker
+    }
+    if (any(grepl("^$", out))){
+      out <- out[-grep("^$", out)] # drop any blank rows
+    }
+    if (any(grepl("^,filename", out))){
+      out <- out[-grep("^,filename", out)] # drop any header rows
+    }
+    out2 <- data.frame(matrix(unlist(strsplit(out, ",")), byrow= T, ncol = 4))
+    names(out2) <- c('Chunk_number', 'Image', 'Area', 'Error')
+    out2$Chunk_number <- as.numeric(out2$Chunk_number) + 1
+    out2$Area <- as.numeric(out2$Area)
+    out2 <- out2[order(out2$Image, out2$Chunk_number),]
+    rownames(out2) <- NULL
+    return(out2)
+  } else {
+    return(NULL)
   }
-  if (any(grepl("^###", out))){
-    out <- out[-grep("###Data###", out)] # drop the ###Data### marker
-  }
-  if (any(grepl("^$", out))){
-    out <- out[-grep("^$", out)] # drop any blank rows
-  }
-  if (any(grepl("^,filename", out))){
-    out <- out[-grep("^,filename", out)] # drop any header rows
-  }
-  out2 <- data.frame(matrix(unlist(strsplit(out, ",")), byrow= T, ncol = 4))
-  names(out2) <- c('Chunk_number', 'Image', 'Area', 'Error')
-  out2$Chunk_number <- as.numeric(out2$Chunk_number) + 1
-  out2$Area <- as.numeric(out2$Area)
-  out2 <- out2[order(out2$Image, out2$Chunk_number),]
-
-  return(out2)
 }

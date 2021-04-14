@@ -25,12 +25,38 @@
 #' }
 
 
-preprocess <- function(source, output_dir = NULL, crop = 0, red_scale = 0, mask_pixels = 0, mask_offset_x = 0, mask_offset_y = 0, workers = NULL) {
+preprocess <- function(source, output_dir, crop = 0, red_scale = 0, mask_pixels = 0, mask_offset_x = 0, mask_offset_y = 0, workers = NULL) {
   path_to_python <- python_version()
   path_to_script <- paste(system.file(package="ALFA"), "ALFA.py", sep="/")
   args <- paste(shQuote(path_to_script), "preprocess", shQuote(source), "-c", crop, "--red_scale", red_scale, "--mask_pixels", mask_pixels, "--mask_offset_x", mask_offset_x, "--mask_offset_y", mask_offset_y)
   if(!is.null(output_dir)){args <- paste(args, "--output_dir", shQuote(output_dir))}
   if(!is.null(workers)){args <- paste(args, "--workers", workers)}
 
-  system2(path_to_python, args = args)
+  out <- system2(path_to_python, args = args, stdout = T)
+  if (any(grepl("^directory", out))){
+    out <- out[-grep("^directory", out)] # drop announcement about a directory being created.
+  }
+  if (any(grepl("^###", out))){
+    out <- out[-grep("###Data###", out)] # drop the ###Data### marker
+  }
+  if (any(grepl("^$", out))){
+    out <- out[-grep("^$", out)] # drop any blank rows
+  }
+  if (any(grepl("^,filename", out))){
+    out <- out[-grep("^,filename", out)] # drop any header rows
+  }
+  
+  out2 <- data.frame(matrix(unlist(strsplit(out, ",")), byrow= T, ncol = 3))
+  out2$X1 <- NULL
+  names(out2) <- c('Filename', 'Error')
+  table(out2$Error)
+  if(any(out2$Error != "No Error")){
+    to_print <- out2
+    to_print$Filename <- sub(".*/", "", to_print$Filename)
+    tab <- table(to_print$Error[to_print$Error != 'No Error'])
+    print(paste("NOTE: The following", sum(tab), "errors were found while preprocessing the directory:", source))
+    print(paste(" ", names(tab), tab, collapse = "; "))
+    print(" See returned data.frame for details.")
+    }
+  return(out2)
 }

@@ -9,7 +9,7 @@
 #'
 python_version <- function(){
   V3 <- suppressWarnings(try(system2("python3", "--version", stdout = TRUE), silent = T))
-  if(class(V3) == 'try-error' | attr(V3, 'status') == 9009){
+  if(class(V3) == 'try-error' | !is.null(attr(V3, 'status'))){
     py3 <- try(system2("py", "--version", stdout = TRUE), silent = T)
   } else {
     V3 <- as.numeric(gsub("Python |\\.\\d*$", "", V3))

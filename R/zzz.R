@@ -37,6 +37,7 @@
   }
   version <- pv()
   if(length(version) == 1){cat("Python ≥ 3.5 is present\n")}
+  python_location <- ifelse(.Platform$OS.type == "windows", system2(command =  "where", args = version, stdout = T), system2(command = "which", args = version, stdout = T))
   # below here checks to make sure that python packages are installed.
   if(length(suppressWarnings(system2(python_location, "-m pip show opencv-python", stdout = T))) == 0){
     cat(paste0("It appears that the Python package cv2 is not installed on this computer. You can install it from the command line with '", python_location, "-m pip install opencv-python'. If this fails, try installing it only for the current user, with ", python_location, "-m pip install --user opencv-python'\n"))
