@@ -10,7 +10,7 @@ Please report any bugs or problems to [C. E. Timothy Paine](mailto:cetpaine@gmai
 # Installation
 ALFA can be installed as an R package, via [CRAN](https://cran.r-project.org). Alternatively, the python script is available on Github, at https://github.com/cetp/ALFA/blob/master/inst/ALFA.py. Both will require you to have Python ≥3.5 on your system. this should already be the case if you are using Mac, Linux or updated version of Windows 10. Python is downloadable from https://www.python.org/downloads/. Several Python modules are also required: cv2, numpy, pandas, exif, piexif, and skimage. The can be installed using pip from the command line.
 
-# Workflow
+# R interface
 Using ALFA requires first that you process your images using the function `preprocess`, then assess the size of the leaves in the processed images using `assess`. The use of two separate functions is intentional: it gives the user the opportunity to examine the processed images, to assure themselves that the assessed leaf area reflects the leaves in the images, rather than shadows or dirt. Both `preprocess` and `assess` function either on a single image, or on an entire directory of images. Currently, ALFA works only on .jpgs. 
 
 ## `preprocess`
@@ -36,7 +36,7 @@ The `assess` function reads a prepared image or directory of prepared images, an
 * res Image resolution, in dots per inch (DPI); if FALSE, the resolution will be read from the exif tag.
 * workers By default, assess will use all but one core for processing a folder of images. Here, you can control how many cores are used. Ignored when assessing a single image. If you are limited by RAM or wish to do other computationally-intensive work while you are processing the images, you may wish to reduce the number of cores made available to the function.
 
-# python interface
+# Python interface
 Once the package is installed, its functions can be called directly in Python:
 
 ```python 
@@ -45,7 +45,7 @@ est = ALFA.estimate("./images/image.jpg", output_dir="./")
 est = ALFA.estimate("./images/*jpg", output_dir="./")
 ```
 
-# command line interface
+# Command line interface
 
 leafareavision includes two command line tools to processes single images or batch process entire directories. On Mac and Linux, pip will make those available to your command line interface as long as your path is set up correctly. pip will issue a warning if this is not the case. I am not sure how thigs work on windows systems, feedback from your experiments is appreciated. 
 
