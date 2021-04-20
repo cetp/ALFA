@@ -1,9 +1,9 @@
 # ALFA
-ALFA (Assess LeaF Area) is a simple collection of functions to aid with the estimation of leaf area from scanned images. It can process single scans or multiple images in a directory using one or multiple cores. ALFA returns estimated areas for all leaf fragments in an image, or for each of them individually. 
+ALFA (Assess LeaF Area) is a simple collection of functions to aid with the estimation of leaf area from scanned images. It can process single scans or multiple images in a single directory using one or multiple cores. ALFA returns estimated areas for all leaf fragments in an image, or for each of them individually. 
 
-ALFA is written in python and utilises the power of the [OpenCV](https://opencv.org/) library to quickly analyse your images. You can interface with the functions via python, R or command line interfaces to best match your workflow. Instructions on how to get going can be found below. 
+ALFA is written in Python and utilises the power of the [OpenCV](https://opencv.org/) library to quickly analyse your images. You can interface with the functions via python, R or the command line to best match your workflow. Instructions on how to get going can be found below. 
 
-This package was developed by [Boris Bongalov](https://bongalov.com) with substantial input from [Sabine Both](https://www.une.edu.au/staff-profiles/ers/sabine-both) and [C. E. Timothy Paine](https://www.une.edu.au/staff-profiles/ers/timothy-paine) and [Mitchell Welch](https://www.une.edu.au/staff-profiles/science-and-technology/mitchell-welch). For detail on the background and motivation of this project, please consult our article introducing ALFA: Paine CET, Bongalov B, Welch, M, and Both S. "‘ALFA’ (Assess LeaF Area): An optimal method for assessing leaf area" (in prep). Methods in Ecology & Evolution
+This package was developed by [Boris Bongalov](https://bongalov.com) with substantial input from [Sabine Both](https://www.une.edu.au/staff-profiles/ers/sabine-both) and [C. E. Timothy Paine](https://www.une.edu.au/staff-profiles/ers/timothy-paine) and [Mitchell Welch](https://www.une.edu.au/staff-profiles/science-and-technology/mitchell-welch). For detail on the background and motivation of this project, please consult our article introducing ALFA: Paine CET, Bongalov B, Welch, M, and Both S. "‘ALFA’ (Assess LeaF Area): An optimal method for assessing leaf area" (in prep). Methods in Ecology & Evolution.
 
 Please report any bugs or problems to [C. E. Timothy Paine](mailto:cetpaine@gmail.com). Pull requests are welcome!
 
@@ -11,7 +11,7 @@ Please report any bugs or problems to [C. E. Timothy Paine](mailto:cetpaine@gmai
 ALFA can be installed as an R package, via [CRAN](https://cran.r-project.org). Alternatively, the python script is available on Github, at https://github.com/cetp/ALFA/blob/master/inst/ALFA.py. Both will require you to have Python ≥3.5 on your system. this should already be the case if you are using Mac, Linux or updated version of Windows 10. Python is downloadable from https://www.python.org/downloads/. Several Python modules are also required: cv2, numpy, pandas, exif, piexif, and skimage. The can be installed using pip from the command line.
 
 # Workflow
-Using ALFA requires first that you process your images using the function `preprocess`, then assess the size of the leaves in the processed images using `assess`. The use of two seperate functions is intentional: it gives the user the opportunity to examine the processed images, to assure themselves that the assessed leaf area reflects the leaves in the images, rather than shadows or dirt. Both `preprocess` and `assess` function either on a single image, or on an entire directory of images. Currently, ALFA works only on .jpgs. 
+Using ALFA requires first that you process your images using the function `preprocess`, then assess the size of the leaves in the processed images using `assess`. The use of two separate functions is intentional: it gives the user the opportunity to examine the processed images, to assure themselves that the assessed leaf area reflects the leaves in the images, rather than shadows or dirt. Both `preprocess` and `assess` function either on a single image, or on an entire directory of images. Currently, ALFA works only on .jpgs. 
 
 ## `preprocess`
 The preprocess() function reads an image or directory of images, giving the user the opportunity to edit it to prepare it for analysis. Common modifications include placing a mask over an existing scale bar, adding a scale bar of a given size, and cropping away the margins of an image. `preprocess` accepts the following arguments: 
@@ -25,15 +25,15 @@ The preprocess() function reads an image or directory of images, giving the user
 * workers By default, preprocess will use all but one core for processing a folder of images. Here, you can control how many cores are used. Ignored when preprocessing a single image. If you are limited by RAM or wish to do other computationally-intensive work while you are processing the images, you may wish to reduce the number of cores made available to the function.
 
 ## `assess`
-The `assess` function reads a prepared image or directory of prepared images, and returns a dataframe with the image name and leaf area estimate. It combines all leaf patches by default but it can also return the area of each leaf(let) if needed. Currently, there is no way to know which area corresponds to each leaf fragment, but this functionality may be added in the future. 
+The `assess` function reads a prepared image or directory of prepared images, and returns a dataframe with the image name, resolution of the image (in dots per inch [DPI]) and leaf area estimate (in cm^2). It combines all leaf patches by default but it can also return the area of each leaf(let) if needed. Currently, there is no way to know which area corresponds to each leaf fragment, but this functionality may be added in the future. 
 
 `assess` accepts the following arguments: 
-* img The path to the image on which you want to assess the leaf area
-* output_dir The directory where to save the processed images, so that you can check that thresholding occurred as expected. Respects tilde expansion. By default, processed images are not saved. This must not be a directory that already exists, so that existing files are not over-written.
+* source The path to the image or directory on which you want to assess the leaf area(s)
+* output_dir The path to the directory where processed images should be saved, so that you can check that thresholding occurred as expected. Respects tilde expansion. By default, processed images are not saved. This must not be a directory that already exists, so that existing files are not over-written.
 * threshold A value between 0 (black) and 255 (white) for classification of background and leaf pixels. Default = 120
-* cut_off Clusters with fewer pixels than this value will be discarded. Default is 10000, which is about 3.3mm x 3.3mm, in a 300 dots per inch image.
-* combine If true the total area will be returned; otherwise each segment will be returned separately
-* res Image resolution, in dots per inch (DPI); if False the resolution will be read from the exif tag.
+* cut_off Clusters with fewer pixels than this value will be discarded. Default is 10000, which is about 3.3mm x 3.3mm, in a 300 DPI image.
+* combine If TRUE the total area will be returned; otherwise each segment will be returned separately. Defaults to FALSE.
+* res Image resolution, in dots per inch (DPI); if FALSE, the resolution will be read from the exif tag.
 * workers By default, assess will use all but one core for processing a folder of images. Here, you can control how many cores are used. Ignored when assessing a single image. If you are limited by RAM or wish to do other computationally-intensive work while you are processing the images, you may wish to reduce the number of cores made available to the function.
 
 # python interface
