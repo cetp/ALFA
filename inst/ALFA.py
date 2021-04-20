@@ -71,29 +71,29 @@ class ALFA:
                     try:
                         metadata = ef.Image(image_meta)
                     except:
-                        return pd.DataFrame(data={'filename': [img], 'Area': None, 'Error' : 'Unable to access EXIF Data for image.'})
+                        return pd.DataFrame(data={'filename': [img], 'Area': None, 'Resolution': None, 'Error' : 'Unable to access EXIF Data for image.'})
 
                 if (not metadata.has_exif) or not(hasattr(metadata, 'x_resolution') or hasattr(metadata, 'Xresolution')):
                     #raise ValueError("Image of unknown resolution. Please specify the res argument in dpi.")
-                    return pd.DataFrame(data={'filename': [img], 'Area': None, 'Error' : 'Image of unknown resolution. Please specify the res argument in dpi.'})
+                    return pd.DataFrame(data={'filename': [img], 'Area': None, 'Resolution': None, 'Error' : 'Image of unknown resolution. Please specify the res argument in dpi.'})
                 
                 if hasattr(metadata, 'x_resolution'):
                     if not metadata.x_resolution == metadata.y_resolution:
                         #raise ValueError( "X and Y resolutions differ in Image. This is unusual, and may indicate a problem.")
-                        return pd.DataFrame(data={'filename': [img], 'Area': None, 'Error' : 'X and Y resolutions differ in Image. This is unusual, and may indicate a problem.'})
+                        return pd.DataFrame(data={'filename': [img], 'Area': None, 'Resolution': None, 'Error' : 'X and Y resolutions differ in Image. This is unusual, and may indicate a problem.'})
                     else:
                         self.res = metadata.x_resolution
                 elif hasattr(metadata, 'Xresolution'):
                     if not metadata.Xresolution == metadata.Yresolution:
                         #raise ValueError( "X and Y resolutions differ in Image. This is unusual, and may indicate a problem.")
-                        return pd.DataFrame(data={'filename': [img], 'Area': None, 'Error' : 'X and Y resolutions differ in Image. This is unusual, and may indicate a problem.'})
+                        return pd.DataFrame(data={'filename': [img], 'Area': None, 'Resolution': None, 'Error' : 'X and Y resolutions differ in Image. This is unusual, and may indicate a problem.'})
                     else:
                         self.res = metadata.Xresolution
 
                 else:
                     if not metadata.XResolution == metadata.YResolution:
                         #raise ValueError( "X and Y resolutions differ in Image. This is unusual, and may indicate a problem.")
-                        return pd.DataFrame(data={'filename': [img], 'Area': None, 'Error' : 'X and Y resolutions differ in Image. This is unusual, and may indicate a problem.'})
+                        return pd.DataFrame(data={'filename': [img], 'Area': None, 'Resolution': None, 'Error' : 'X and Y resolutions differ in Image. This is unusual, and may indicate a problem.'})
                     else:
                         self.res = metadata.XResolution
 
@@ -101,10 +101,10 @@ class ALFA:
             try:
                 scan = cv2.imread(os.path.expanduser(img))
             except:
-                return pd.DataFrame(data={'filename': [img], 'Area': None, 'Error' : 'Unable to open image for processing. Check the file format.'})
+                return pd.DataFrame(data={'filename': [img], 'Area': None, 'Resolution': None, 'Error' : 'Unable to open image for processing. Check the file format.'})
         
             if scan is None:
-                return pd.DataFrame(data={'filename': [img], 'Area': None, 'Error' : 'Unable to open image for processing. Check the file format.'})
+                return pd.DataFrame(data={'filename': [img], 'Area': None, 'Resolution': None, 'Error' : 'Unable to open image for processing. Check the file format.'})
 
             # transfer to grayscale
             scan = cv2.cvtColor(scan, cv2.COLOR_BGR2GRAY)
@@ -112,7 +112,7 @@ class ALFA:
             # classify leaf and background
             if self.threshold < 0 or self.threshold > 255:
                 #raise ValueError("Threshold must be an integer between 0 and 255.")
-                return pd.DataFrame(data={'filename': [img], 'Area': None, 'Error' : 'Error: Threshold must be an integer between 0 and 255.'})
+                return pd.DataFrame(data={'filename': [img], 'Area': None, 'Resolution': None, 'Error' : 'Error: Threshold must be an integer between 0 and 255.'})
 
             scan = cv2.threshold(scan, self.threshold, 255, cv2.THRESH_BINARY_INV)[1]
 
@@ -128,7 +128,7 @@ class ALFA:
             # remove small patches
             if self.cut_off < 0:
                 #raise ValueError("cutoff for small specks must not be negative.")
-                return pd.DataFrame(data={'filename': [img], 'Area': None, 'Error' : 'cutoff for small specks must not be negative.'})
+                return pd.DataFrame(data={'filename': [img], 'Area': None, 'Resolution': None, 'Error' : 'cutoff for small specks must not be negative.'})
             
             mask[leaflets[1] < self.cut_off] = False
 
@@ -153,9 +153,9 @@ class ALFA:
                         piexif.transplant(os.path.abspath(os.path.expanduser(img)), write_to)
 
             if self.combine:
-                return pd.DataFrame(data={'filename': [img], 'Area': [areas.sum()], 'Error' : 'No Error'})
+                return pd.DataFrame(data={'filename': [img], 'Area': [areas.sum()], 'Resolution': self.res, 'Error' : 'No Error'})
             else:
-                return pd.DataFrame(data={'filename': [img] * areas.shape[0], 'Area': areas, 'Error' : 'No Error'})
+                return pd.DataFrame(data={'filename': [img] * areas.shape[0], 'Area': areas, 'Resolution': res, 'Error' : 'No Error'})
         elif os.path.isdir(os.path.abspath(os.path.expanduser(img))):
             # obtain a list of images
             images = os.listdir(os.path.abspath(os.path.expanduser(img)))
@@ -171,7 +171,7 @@ class ALFA:
             return pd.concat(results)
         else:
             #raise ValueError('Your input {img} needs to be a path to an image or a directory.')
-            return pd.DataFrame(data={'filename': [img], 'Area': None, 'Error' : 'Your input {img} needs to be a path to an image or a directory.'})
+            return pd.DataFrame(data={'filename': [img], 'Area': None, 'Resolution': None, 'Error' : 'Your input {img} needs to be a path to an image or a directory.'})
 
     def preprocess(self, img):
         """
