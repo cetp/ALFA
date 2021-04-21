@@ -160,7 +160,7 @@ class ALFA:
             # obtain a list of images
             images = os.listdir(os.path.abspath(os.path.expanduser(img)))
             images = [os.path.join(img, i) for i in images]
-
+            # print(self.workers)
             # create a workers pool and start processing
             pool = multiprocessing.Pool(self.workers)
             results = pool.map(self.estimate, images)
@@ -431,6 +431,7 @@ if __name__ == '__main__':
     estimator = ALFA()
 
     if args.command == 'estimate':
+        output_dir = None
         if args.output_dir:
             output_dir = os.path.abspath(os.path.expanduser(args.output_dir))
            
@@ -460,9 +461,10 @@ if __name__ == '__main__':
 
         #Check that there actually were some images sucessfully processed.
         #If not, delete the the output directory.
-        file_list = [f for f in listdir(output_dir) if isfile(join(output_dir, f))]
-        if len(file_list) == 0:
-            os.rmdir(output_dir)
+        if output_dir is not None:
+            file_list = [f for f in listdir(output_dir) if isfile(join(output_dir, f))]
+            if len(file_list) == 0:
+                os.rmdir(output_dir)
 
 
     elif args.command == 'preprocess':

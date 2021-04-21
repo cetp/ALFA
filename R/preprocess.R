@@ -36,6 +36,7 @@ preprocess <- function(source, output_dir, crop = 0, red_scale = 0, mask_pixels 
   if('status' %in% attributes(out)){
     return(out)
   } else {
+    out <- sub("\\r", "", out)
     if (any(grepl("^directory", out))){
       out <- out[-grep("^directory", out)] # drop announcement about a directory being created.
     }
