@@ -33,7 +33,7 @@ preprocess <- function(source, output_dir, crop = 0, red_scale = 0, mask_pixels 
   if(!is.null(workers)){args <- paste(args, "--workers", workers)}
   
   out <- system2(path_to_python, args = args, stdout = T)
-  if(attr(out, 'status') == 1){
+  if('status' %in% attributes(out)){
     return(out)
   } else {
     if (any(grepl("^directory", out))){

@@ -38,7 +38,7 @@ assess <- function(source, output_dir = NULL, threshold = 120, cut_off = 10000, 
   if(!is.null(workers)){args <- paste(args, "--workers", workers)}
   
   out <- system2(command = path_to_python, args = args, stdout = TRUE)
-  if(attr(out, 'status') == 1){
+  if('status' %in% attributes(out)){
     return(out)
   } else{
     #If we have some data returned by Python, then process it
