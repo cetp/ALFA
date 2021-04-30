@@ -155,8 +155,12 @@ class ALFA:
             if self.combine:
                 return pd.DataFrame(data={'filename': [img], 'Area': [areas.sum()], 'Resolution': self.res, 'Error' : 'No Error'})
             else:
-                return pd.DataFrame(data={'filename': [img] * areas.shape[0], 'Area': areas, 'Resolution': res, 'Error' : 'No Error'})
+                return pd.DataFrame(data={'filename': [img] * areas.shape[0], 'Area': areas, 'Resolution': self.res, 'Error' : 'No Error'})
         elif os.path.isdir(os.path.abspath(os.path.expanduser(img))):
+            
+            if os.path.abspath(os.path.expanduser(img)) == self.output_dir:
+                return None
+            
             # obtain a list of images
             images = os.listdir(os.path.abspath(os.path.expanduser(img)))
             images = [os.path.join(img, i) for i in images]
@@ -181,9 +185,9 @@ class ALFA:
         @return None
         """
         if os.path.isfile(os.path.abspath(os.path.expanduser(img))):
-            if not self.output_dir:
-                output_dir = f'{os.path.split(os.path.isfile(os.path.abspath(os.path.expanduser(img))))[0]}/preprocessed'
-                os.makedirs(output_dir)
+            #if not self.output_dir:
+            #    output_dir = f'{os.path.split(os.path.isfile(os.path.abspath(os.path.expanduser(img))))[0]}/preprocessed'
+            #    os.makedirs(output_dir)
 
             if os.path.split(os.path.abspath(os.path.expanduser(img)))[0] == self.output_dir:
                 #raise ValueError(
@@ -259,7 +263,9 @@ class ALFA:
             #Create the processed image (even if EXIF data isn't viable)
             cv2.imwrite(file_name, scan)
             
-            if (not metadata.has_exif) or not(hasattr(metadata, 'x_resolution') or hasattr(metadata, 'Xresolution')  or hasattr(metadata, 'Xresolution')):
+            #if (not metadata.has_exif) or not(hasattr(metadata, 'x_resolution') or hasattr(metadata, 'Xresolution')):
+
+            if (not metadata.has_exif) or not(hasattr(metadata, 'x_resolution') or hasattr(metadata, 'Xresolution')):
                 # EXIF has no resolution data present
                 return pd.DataFrame(data={'filename': [img], 'Pre-process Result' : 'Error: EXIF Resolution Data Not transferred to Pre-processed image.'})
             else:
@@ -274,6 +280,10 @@ class ALFA:
                 
 
         elif os.path.isdir(os.path.abspath(os.path.expanduser(img))):
+            
+            if os.path.abspath(os.path.expanduser(img)) == self.output_dir:
+                return None
+            
             images = os.listdir(os.path.abspath(os.path.expanduser(img)))
             images = [os.path.join(os.path.abspath(os.path.expanduser(img)), i) for i in images]
 
@@ -285,7 +295,7 @@ class ALFA:
 
             return pd.concat(results)
         else:
-            os.rmdir(output_dir)
+            #os.rmdir(output_dir)
             return pd.DataFrame(data={'filename': [img], 'Pre-process Result' : 'Unable to open file or directory.'})
             #raise ValueError(f'Your input {img} needs to be either a file or a directory')
     
@@ -455,11 +465,11 @@ if __name__ == '__main__':
 
         output = estimator.estimate(args.input)
         print('###Data###')
-        print(output.to_csv(sep=',')) #quoting=csv.QUOTE_NONE)
+        print(output[['filename','Area', 'Resolution','Error']].to_csv(sep=',')) #quoting=csv.QUOTE_NONE)
         if args.csv:
-            output.to_csv(args.csv)
+            output[['filename','Area', 'Resolution','Error']].to_csv(args.csv)
 
-        #Check that there actually were some images sucessfully processed.
+        #Check that there actually were some images successfully processed.
         #If not, delete the the output directory.
         if output_dir is not None:
             file_list = [f for f in listdir(output_dir) if isfile(join(output_dir, f))]
@@ -468,7 +478,17 @@ if __name__ == '__main__':
 
 
     elif args.command == 'preprocess':
-        output_dir = os.path.abspath(os.path.expanduser(args.output_dir))
+
+        if args.output_dir: 
+            output_dir = os.path.abspath(os.path.expanduser(args.output_dir))
+        else:
+
+            if os.path.isdir(os.path.abspath(os.path.expanduser(args.input))):
+                output_dir = os.path.join(os.path.abspath(os.path.expanduser(args.input)),'preprocessed')
+            else:
+                output_dir = os.path.join(os.path.split(os.path.abspath(os.path.expanduser(args.input)))[0],'preprocessed')
+            
+        
         if not os.path.exists(output_dir):
             estimator.output_dir = output_dir
             os.makedirs(output_dir)
@@ -492,9 +512,9 @@ if __name__ == '__main__':
 
         output =  estimator.preprocess(args.input)
         print('###Data###')
-        print(output.to_csv(sep=',')) #quoting=csv.QUOTE_NONE)
+        print(output[['filename','Pre-process Result']].to_csv(sep=',')) #quoting=csv.QUOTE_NONE)
         if args.csv:
-            output.to_csv(os.path.join(output_dir,args.csv))
+            output[['filename','Pre-process Result']].to_csv(os.path.join(output_dir,args.csv))
 
         #Check that there actually were some images sucessfully processed.
         #If not, delete the the output directory.
