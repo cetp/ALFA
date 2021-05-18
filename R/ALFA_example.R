@@ -6,7 +6,7 @@
 #'
 #' @examples
 #' ALFA_example("raw1/img1.jpg")
-#' input_dir <- ALFA_example("raw")
+#' input_dir <- ALFA_example("raw1")
 
 ALFA_example <- function (path = NULL) {
   if (is.null(path)) {

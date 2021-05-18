@@ -9,7 +9,7 @@
 #' @param mask_pixels How many pixels should each side of the masking window be? Default = 0.
 #' @param mask_offset_x Offset for positioning the masking window in number of pixels from right to left of the image.
 #' @param mask_offset_y Offset for positioning the masking window in number of pixels from bottom to top of the image.
-#' @param workers By default, preprocess will use all but one core for processing a folder of images. Here, you can control how many cores are used. Ignored when preprocessing a single image.
+#' @param workers By default, preprocess will use all but one core for processing a folder of images. Here, you can control how many cores are used. Ignored when preprocessing a single image. Note that on virtual 
 #'
 #' @return No value is returned. The side effect is that the processed image is saved in the directory specified in \code{output_dir}.
 #'
