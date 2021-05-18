@@ -1,8 +1,8 @@
 .onLoad <- function(libname, pkgname) {
   pv <- function(){
-    V3 <- suppressWarnings(try(system2("python3", "--version", stdout = TRUE), silent = T))
+    V3 <- suppressWarnings(try(system2("python3", "--version", stdout = TRUE), silent = TRUE))
     if(class(V3) == 'try-error' | !is.null(attr(V3, 'status'))){
-      py3 <- try(system2("py", "--version", stdout = TRUE), silent = T)
+      py3 <- try(system2("py", "--version", stdout = TRUE), silent = TRUE)
     } else {
       V3 <- as.numeric(gsub("Python |\\.\\d*$", "", V3))
       if (V3 >= 3.5){
@@ -18,51 +18,52 @@
       }
     }
     if((!is.na(V3) & V3 >= 3 & V3 < 3.5)| (!is.na(py3) & py3 >= 3 & py3 < 3.5) ){
-      print(paste("It appears that Python", V3, "is installed on this system. Please update it to Python 3.5 or newer, from https://www.python.org/downloads/"))
+      packageStartupMessage(paste("It appears that Python", V3, "is installed on this system. Please update it to Python 3.5 or newer, from https://www.python.org/downloads/"))
       return(invisible())
     }
-    V2 <- try(system2("python", "--version", stdout = TRUE), silent = T)
+    V2 <- try(system2("python", "--version", stdout = TRUE), silent = TRUE)
     V2 <- as.numeric(gsub("Python |\\.\\d*$", "", V2))
     if(is.na(V2)){V2 <- 0}
     if(V2 >= 3 & V2 < 3.5){
-      print(paste("It appears that Python", V2, "is installed on this system. Please update it to Python 3.5 or newer, from https://www.python.org/downloads/"))
+      packageStartupMessage(paste("It appears that Python", V2, "is installed on this system. Please update it to Python 3.5 or newer, from https://www.python.org/downloads/"))
       return(invisible())
     } else{
       if(V2 >= 3.5){
         return('python')
       } else {
-        cat("It appears that Python 3.5 or newer is not installed on this system. Please install it from https://www.python.org/downloads/, and try again")
+        packageStartupMessage("It appears that Python 3.5 or newer is not installed on this system. Please install it from https://www.python.org/downloads/, and try again")
       }
     }
   }
+  
   version <- pv()
-  if(length(version) == 1){cat("Python ≥ 3.5 is present\n")}
-  python_location <- ifelse(.Platform$OS.type == "windows", system2(command =  "where", args = version, stdout = T), system2(command = "which", args = version, stdout = T))
+  if(length(version) == 1){packageStartupMessage("Python >= 3.5 is present")}
+  python_location <- ifelse(.Platform$OS.type == "windows", system2(command =  "where", args = version, stdout = TRUE), system2(command = "which", args = version, stdout = TRUE))
   # below here checks to make sure that python packages are installed.
-  if(length(suppressWarnings(system2(python_location, " -m pip show opencv-python", stdout = T))) == 0){
-    cat(paste0("It appears that the Python package cv2 is not installed on this computer. You can install it from the command line with '", python_location, " -m pip install opencv-python'. If this fails, try installing it only for the current user, with ", python_location, " -m pip install --user opencv-python'\n"))
+  if(length(suppressWarnings(system2(python_location, " -m pip show opencv-python", stdout = TRUE))) == 0){
+    packageStartupMessage(paste0("It appears that the Python package cv2 is not installed on this computer. You can install it from the command line with '", python_location, " -m pip install opencv-python'. If this fails, try installing it only for the current user, with ", python_location, " -m pip install --user opencv-python'"))
     return(invisible())
-  } else {cat("  cv2 is present\n")}
-  if(length(suppressWarnings(system2(python_location, " -m pip show numpy", stdout = T))) == 0){
-    cat(paste0("It appears that the Python package numpy is not installed on this computer. You can install it from the command line with '", python_location, " -m pip install numpy'. If this fails, try installing it only for the current user, with ", python_location, " -m pip install --user numpy'\n"))
+  } else {packageStartupMessage("  cv2 is present")}
+  if(length(suppressWarnings(system2(python_location, " -m pip show numpy", stdout = TRUE))) == 0){
+    packageStartupMessage(paste0("It appears that the Python package numpy is not installed on this computer. You can install it from the command line with '", python_location, " -m pip install numpy'. If this fails, try installing it only for the current user, with ", python_location, " -m pip install --user numpy'"))
     return(invisible())
-  }else {cat("  numpy is present\n")}
-  if(length(suppressWarnings(system2(python_location, " -m pip show pandas", stdout = T))) == 0){
-    cat(paste0("It appears that the Python package pandas is not installed on this computer. You can install it from the command line with '", python_location, " -m pip install pandas'. If this fails, try installing it only for the current user, with '", python_location, " -m pip install --user pandas'\n"))
+  }else {packageStartupMessage("  numpy is present")}
+  if(length(suppressWarnings(system2(python_location, " -m pip show pandas", stdout = TRUE))) == 0){
+    packageStartupMessage(paste0("It appears that the Python package pandas is not installed on this computer. You can install it from the command line with '", python_location, " -m pip install pandas'. If this fails, try installing it only for the current user, with '", python_location, " -m pip install --user pandas'"))
     return(invisible())
-  }else {cat("  pandas is present\n")}
-  if(length(suppressWarnings(system2(python_location, " -m pip show exif", stdout = T))) == 0){
-    cat(paste0("It appears that the Python package exif is not installed on this computer. You can install it from the command line with '", python_location, " -m pip install exif'. If this fails, try installing it only for the current user, with '", python_location, " -m pip install --user exif'\n"))
+  }else {packageStartupMessage("  pandas is present")}
+  if(length(suppressWarnings(system2(python_location, " -m pip show exif", stdout = TRUE))) == 0){
+    packageStartupMessage(paste0("It appears that the Python package exif is not installed on this computer. You can install it from the command line with '", python_location, " -m pip install exif'. If this fails, try installing it only for the current user, with '", python_location, " -m pip install --user exif'"))
     return(invisible())
-  }else {cat("  exif is present\n")}
-  if(length(suppressWarnings(system2(python_location, " -m pip show piexif", stdout = T))) == 0){
-    cat(paste0("It appears that the Python package piexif is not installed on this computer. You can install it from the command line with '", python_location, " -m pip install piexif'. If this fails, try installing it only for the current user, with '", python_location, " -m pip install --user piexif'\n"))
+  }else {packageStartupMessage("  exif is present")}
+  if(length(suppressWarnings(system2(python_location, " -m pip show piexif", stdout = TRUE))) == 0){
+    packageStartupMessage(paste0("It appears that the Python package piexif is not installed on this computer. You can install it from the command line with '", python_location, " -m pip install piexif'. If this fails, try installing it only for the current user, with '", python_location, " -m pip install --user piexif'"))
     return(invisible())
-  }else {cat("  piexif is present\n")}
-  if(length(suppressWarnings(system2(python_location, " -m pip show scikit-image", stdout = T))) == 0){
-    cat(paste0("It appears that the Python package skimage is not installed on this computer. You can install it from the command line with '", python_location, " -m pip install scikit-image'. If this fails, try installing it only for the current user, with '", python_location, " -m pip install --user scikit-image'\n"))
+  }else {packageStartupMessage("  piexif is present")}
+  if(length(suppressWarnings(system2(python_location, " -m pip show scikit-image", stdout = TRUE))) == 0){
+    packageStartupMessage(paste0("It appears that the Python package skimage is not installed on this computer. You can install it from the command line with '", python_location, " -m pip install scikit-image'. If this fails, try installing it only for the current user, with '", python_location, " -m pip install --user scikit-image'"))
     return(invisible())
-  }else {cat("  skimage is present\n")}
-  cat("All required Python modules are present. ALFA is loaded.\n")
+  }else {packageStartupMessage("  skimage is present")}
+  packageStartupMessage("All required Python modules are present. ALFA is loaded.")
   return(invisible())
 }

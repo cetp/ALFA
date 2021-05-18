@@ -6,8 +6,8 @@
 #' @param count How many images should be placed into each subdirectory?
 #'
 #' @examples
-#' input_dir <- area_example("raw")
-#' sort_by_count(input_dir, 4)
+#' input_dir <- ALFA_example("raw1")
+#' sort_by_count(input_dir, 2)
 
 sort_by_count <- function (path, count) {
   path_to_python <- python_version()

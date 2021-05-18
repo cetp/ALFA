@@ -10,9 +10,9 @@ sort_by_resolution(path)
 \item{path}{Name of folder in which to sort images.}
 }
 \description{
-Some image-processing programs assume that ones images are sorted by resolution. LS needs to be told what the scale for each image is. It can't guess that. This helper function looks up the resolutions of each file, and moves them into folders. Files for which no resolution data is available in exif are placed in a folder called 'resolution_NA'.
+Some image-processing programs assume that ones images are sorted by resolution. This helper function looks up the resolutions of each file, and moves them into folders. Files for which no resolution data is available in exif are placed in a folder called 'resolution_NA'.
 }
 \examples{
-input_dir <- area_example("raw")
+input_dir <- area_example("raw1")
 sort_by_resolution(input_dir)
 }

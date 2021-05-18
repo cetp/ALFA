@@ -13,6 +13,6 @@ ALFA_example(path = NULL)
 ALFA comes bundled with a number of sample files in its inst/extdata directory. This function make them easy to access.
 }
 \examples{
-ALFA_example("raw/img5.jpg")
+ALFA_example("raw1/img1.jpg")
 input_dir <- ALFA_example("raw")
 }

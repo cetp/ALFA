@@ -5,7 +5,7 @@
 #' @param path Name of file. If NULL, the example files will be listed.
 #'
 #' @examples
-#' ALFA_example("raw/img5.jpg")
+#' ALFA_example("raw1/img1.jpg")
 #' input_dir <- ALFA_example("raw")
 
 ALFA_example <- function (path = NULL) {
