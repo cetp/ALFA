@@ -32,14 +32,14 @@ preprocess <- function(source, output_dir, crop = 0, red_scale = 0, mask_pixels 
   if(!is.null(output_dir)){args <- paste(args, "--output_dir", shQuote(output_dir))}
   if(!is.null(workers)){args <- paste(args, "--workers", workers)}
   
-  out <- system2(path_to_python, args = args, stdout = T)
+  out <- system2(path_to_python, args = args, stdout = TRUE)
   if('status' %in% attributes(out)){
     return(out)
   } else {
     out <- sub("\\r", "", out)
-    if (any(grepl("^directory", out))){
+#    if (any(grepl("^directory", out))){
       out <- out[-grep("^directory", out)] # drop announcement about a directory being created.
-    }
+#    }
     if (any(grepl("^###", out))){
       out <- out[-grep("###Data###", out)] # drop the ###Data### marker
     }
@@ -60,7 +60,7 @@ preprocess <- function(source, output_dir, crop = 0, red_scale = 0, mask_pixels 
       tab <- table(to_print$Error[to_print$Error != 'No Error'])
       print(paste("NOTE: The following", sum(tab), "errors were found while preprocessing the directory:", source))
       print(paste(" ", names(tab), tab, collapse = "; "))
-      print(" See returned data.frame for details.")
+      print("  See returned data.frame for details.")
     }
     return(out2)
   }
