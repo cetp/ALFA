@@ -6,28 +6,28 @@
 \usage{
 assess(
   source,
+  output_dir = NULL,
   threshold = 120,
   cut_off = 10000,
-  output_dir = NULL,
   combine = FALSE,
   res = NULL,
   workers = NULL
 )
 }
 \arguments{
+\item{source}{The path to the image or the directory of images for which you want to assess the leaf area}
+
+\item{output_dir}{The directory where to save the processed images, so that you can check that thresholding occurred as expected. Respects tilde expansion. By default, processed images are not saved. This must not be a directory that already exists, so that existing files are not over-written.}
+
 \item{threshold}{A value between 0 (black) and 255 (white) for classification of background and leaf pixels. Default = 120}
 
 \item{cut_off}{Clusters with fewer pixels than this value will be discarded. Default is 10000, which is about 3.3mm x 3.3mm, in a 300 dots per inch image.}
-
-\item{output_dir}{The directory where to save the processed images, so that you can check that thresholding occurred as expected. Respects tilde expansion. By default, processed images are not saved. This must not be a directory that already exists, so that existing files are not over-written.}
 
 \item{combine}{If true the total area will be returned; otherwise each segment will be returned separately}
 
 \item{res}{Image resolution, in dots per inch (DPI); if False the resolution will be read from the exif tag.'}
 
 \item{workers}{By default, assess will use all but one core for processing a folder of images. Here, you can control how many cores are used. Ignored when assessing a single image.}
-
-\item{img}{The path to the image on which you want to assess the leaf area}
 }
 \value{
 The assessed leaf area for a single image or entire folder of images, in cm^2 is returned as a \code{data.frame}.
@@ -36,16 +36,16 @@ The assessed leaf area for a single image or entire folder of images, in cm^2 is
 This function assesses the area of leaves taken from a single image. Ideally, the image will be obtained from a flatbed scanner, and will include resolution information in the exif metadata. Images derived from cameras can also be used, but in that case, you will probably need to supply the resolution explictly, using the argument res.
 }
 \examples{
-img <- ALFA_example("prepared/img2.jpg")
+img <- ALFA_example("prepared/img1.jpg")
 input_dir <- ALFA_example("prepared")
 
-output_dir <- ALFA_example("processed")
-
-
 # If the argument output_dir is omitted,  do not save  processed images
-assess(img, res = 400, combine = F)
-assess(input_dir, combine = F)
+assess(source = img, res = 400, combine = FALSE)
+assess(source = input_dir, combine = FALSE)
 \dontrun{
-assess(img, output_dir = output_dir, res = 400, combine = F)
+A new directory, 'processed1' will be created in the working directory
+to hold the thresholded files. 
+output_dir <- "processed1"
+assess(source = input_dir, output_dir = output_dir, res = 400, combine = FALSE)
 }
 }

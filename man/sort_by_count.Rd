@@ -15,6 +15,6 @@ sort_by_count(path, count)
 Some times it's convenient to sort images into directories such that every directory has the same number of images. This convenience function does that.
 }
 \examples{
-input_dir <- area_example("raw")
-sort_by_count(input_dir, 4)
+input_dir <- ALFA_example("raw")
+sort_by_count(input_dir, 2)
 }

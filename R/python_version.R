@@ -8,9 +8,9 @@
 #'
 #'
 python_version <- function(){
-  V3 <- suppressWarnings(try(system2("python3", "--version", stdout = TRUE), silent = T))
+  V3 <- suppressWarnings(try(system2("python3", "--version", stdout = TRUE), silent = TRUE))
   if(class(V3) == 'try-error' | !is.null(attr(V3, 'status'))){
-    py3 <- try(system2("py", "--version", stdout = TRUE), silent = T)
+    py3 <- try(system2("py", "--version", stdout = TRUE), silent = TRUE)
   } else {
     V3 <- as.numeric(gsub("Python |\\.\\d*$", "", V3))
     if (V3 >= 3.5){
@@ -29,7 +29,7 @@ python_version <- function(){
     print(paste("It appears that Python", V3, "is installed on this system. Please update it to Python 3.5 or newer, from https://www.python.org/downloads/"))
     return(NULL)
   }
-  V2 <- try(system2("python", "--version", stdout = TRUE), silent = T)
+  V2 <- try(system2("python", "--version", stdout = TRUE), silent = TRUE)
   V2 <- as.numeric(gsub("Python |\\.\\d*$", "", V2))
   if(is.na(V2)){V2 <- 0}
   if(V2 >= 3 & V2 < 3.5){

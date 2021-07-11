@@ -6,7 +6,7 @@
 \usage{
 preprocess(
   source,
-  output_dir = NULL,
+  output_dir,
   crop = 0,
   red_scale = 0,
   mask_pixels = 0,
@@ -30,7 +30,7 @@ preprocess(
 
 \item{mask_offset_y}{Offset for positioning the masking window in number of pixels from bottom to top of the image.}
 
-\item{workers}{By default, preprocess will use all but one core for processing a folder of images. Here, you can control how many cores are used. Ignored when preprocessing a single image.}
+\item{workers}{By default, preprocess will use all but one core for processing a folder of images. Here, you can control how many cores are used. Ignored when preprocessing a single image. Note that on virtual}
 }
 \value{
 No value is returned. The side effect is that the processed image is saved in the directory specified in \code{output_dir}.
@@ -39,13 +39,17 @@ No value is returned. The side effect is that the processed image is saved in th
 \code{preprocess} prepares images of leaves for assessment using \code{assess}. Not all images require preprocessing. It provides options to crop away colored margins from an image, to mask out an un-needed scale bar, or to insert a scale bar of a particular size. Either a single image or single directory of images can be processed at once. If the latter, processing can be performed in parallel.
 }
 \examples{
-img <- ALFA_example("raw/img4.jpg")
+img <- ALFA_example("raw/img1.jpg")
 input_dir <- ALFA_example("raw")
-output_dir <- ALFA_example("prepared")
 
 \dontrun{
-preprocess(img, output_dir, crop = -300), mask_pixels = 500, mask_offset_x = 0, mask_offset_y = 20)
+A new directory, 'prepared1' will be created in the working directory 
+to hold the thresholded files. 
+output_dir <- "prepared1"
+preprocess(img, output_dir, 
+  crop = 300, mask_pixels = 500, mask_offset_x = 0, mask_offset_y = 20)
 
-preprocess(input_dir, output_dir, crop = 300, mask_pixels = 500, mask_offset_x = 0, mask_offset_y = 2300)
+preprocess(input_dir, output_dir, 
+  crop = 300, mask_pixels = 500, mask_offset_x = 0, mask_offset_y = 2300)
 }
 }
