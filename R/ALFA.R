@@ -19,4 +19,3 @@
 #'Paine, C.E.T., Bongalov, B., Welch, M., Both, S. In review. "‘ALFA’ (Assess LeaF Area): An optimal method for assessing leaf area" Methods in Ecology & Evolution
 #' @docType package
 #' @name ALFA
-NULL

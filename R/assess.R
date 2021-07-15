@@ -16,7 +16,6 @@
 #' @examples
 #' img <- ALFA_example("prepared/img1.jpg")
 #' input_dir <- ALFA_example("prepared")
-#'
 #' # If the argument output_dir is omitted,  do not save  processed images
 #' assess(source = img, res = 400, combine = FALSE)
 #' assess(source = input_dir, combine = FALSE)
