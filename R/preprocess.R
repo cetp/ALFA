@@ -14,6 +14,7 @@
 #' @return No value is returned. The side effect is that the processed image is saved in the directory specified in \code{output_dir}.
 #'
 #' @examples
+<<<<<<< HEAD
 #' img <- ALFA_example("raw/img1.jpg")
 #' input_dir <- ALFA_example("raw")
 #'
