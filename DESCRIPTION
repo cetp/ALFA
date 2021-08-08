@@ -7,11 +7,24 @@ Authors@R: c(
     person(given = "Mitchell", family = "Welch", email = "mwelch8@une.edu.au", role = "aut"),
     person(given = "Boris", family = "Bongalov", email = "b.bongalov@gmail.com", role = "aut"),
     person(given = "Sabine", family = "Both", email = "sabineboth.mail@gmail.com", role = "aut"))
+URL: https://github.com/cetp/ALFA
 Maintainer: C. E. Timothy Paine <cetpaine@gmail.com>
 Description: Assess the surface area of plant leaves, given images. 
-    The package includes functions to prep-rocess the images.
+    The package includes functions to preprocess the images.
+Config/reticulate:
+  list(
+    packages = list(
+      list(package = "argparse", pip = FALSE),
+      list(package = "multiprocessing", pip = FALSE),
+      list(package = "opencv-python", pip = FALSE),
+      list(package = "exif", pip = FALSE),
+      list(package = "pandas", pip = FALSE),
+      list(package = "scikit-image", pip = FALSE)
+      list(package = "piexif", pip = FALSE)
+    )
+  ) 
+Suggests: reticulate
 License: MIT + file LICENSE
+SystemRequirements: Python (>= 2.7.0)
 Encoding: UTF-8
-Imports:
-  parallel
 RoxygenNote: 7.1.1

@@ -6,7 +6,7 @@ import argparse
 import multiprocessing
 import os
 from os import listdir
-from os.path import isfile,isdir, join
+from os.path import isfile, isdir, join
 import tempfile
 import cv2
 import csv

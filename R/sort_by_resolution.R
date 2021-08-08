@@ -5,14 +5,11 @@
 #' @param path Name of folder in which to sort images.
 #'
 #' @examples
-#' input_dir <- ALFA_example("raw")
+#' input_dir <- "https://github.com/cetp/ALFA/blob/master/inst/extdata/raw"
 #' sort_by_resolution(input_dir)
 
 sort_by_resolution <- function (path) {
-  path_to_python <- python_version()
-  path_to_script <- paste(system.file(package="ALFA"), "ALFA.py", sep="/")
-
-  args <- paste(shQuote(path_to_script), "resolution_sort", shQuote(path))
-  out <- system2(command = path_to_python, args = args, stdout = TRUE)
+  out <- resolution_sort(path = path)
+  return(out)
   }
 
