@@ -6,14 +6,12 @@
 #' @param count How many images should be placed into each subdirectory?
 #'
 #' @examples
-#' input_dir <- ALFA_example("raw")
+#' input_dir <- "https://github.com/cetp/ALFA/blob/master/inst/extdata/raw"
 #' sort_by_count(input_dir, 2)
 
 sort_by_count <- function (path, count) {
-  path_to_python <- python_version()
-  path_to_script <- paste(system.file(package="ALFA"), "ALFA.py", sep="/")
-
+  
   args <- paste(shQuote(path_to_script), "number_sort", shQuote(path), "--fileno", count)
-  out <- system2(command = path_to_python, args = args, stdout = TRUE)
+  number_sort(path = path, count = count)
   }
 

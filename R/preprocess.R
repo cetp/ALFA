@@ -14,8 +14,8 @@
 #' @return No value is returned. The side effect is that the processed image is saved in the directory specified in \code{output_dir}.
 #'
 #' @examples
-#' img <- ALFA_example("raw/img1.jpg")
-#' input_dir <- ALFA_example("raw")
+#' img <- "https://github.com/cetp/ALFA/blob/master/inst/extdata/raw/img1.jpg"
+#' input_dir <- "https://github.com/cetp/ALFA/blob/master/inst/extdata/raw"
 #'
 #' \dontrun{
 #' A new directory, 'prepared1' will be created in the working directory 
@@ -30,9 +30,6 @@
 
 
 preprocess <- function(source, output_dir, crop = 0, red_scale = 0, mask_pixels = 0, mask_offset_x = 0, mask_offset_y = 0, workers = NULL) {
-  path_to_python <- python_version()
-  path_to_script <- paste(system.file(package="ALFA"), "ALFA.py", sep="/")
-  args <- paste(shQuote(path_to_script), "preprocess", shQuote(source), "-c", crop, "--red_scale", red_scale, "--mask_pixels", mask_pixels, "--mask_offset_x", mask_offset_x, "--mask_offset_y", mask_offset_y)
 
   # Create an output directory if none exists, or if it exists with no files in it.
   if(length(output_dir) != 1) {
@@ -43,7 +40,11 @@ preprocess <- function(source, output_dir, crop = 0, red_scale = 0, mask_pixels 
   }
   if(!is.null(workers)){args <- paste(args, "--workers", workers)}
   
-  out <- system2(path_to_python, args = args, stdout = TRUE)
+  if(workers > parallel::detectCores()){
+    workers <- parallel::detectCores()
+    cat(paste("You have requested more cores than are available. All", parallel::detectCores(), "cores will be used"))
+  }
+  out <- preprocess(source = source, output_dir = output_dir, crop = crop, red_scale = red_scale, mask_pixels = mask_pixels, mask_offset_x = mask_offset_x, mask_offset_y = mask_offset_y, workers = workers)
   if('status' %in% attributes(out)){
     return(out)
   } else {

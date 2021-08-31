@@ -6,17 +6,17 @@ import argparse
 import multiprocessing
 import os
 from os import listdir
-from os.path import isfile,isdir, join
+from os.path import isfile, isdir, join
 import tempfile
-import cv2
 import csv
 import numpy as np
 import pandas as pd
-import exif as ef
-import piexif
 import shutil
 from pandas.core.frame import DataFrame
 from skimage import measure
+import piexif
+import exif as ef
+import cv2
 
 class ALFA:
     """Calculate leaf area."""
