@@ -15,8 +15,6 @@ Suggests: reticulate
 Config/reticulate:
   list(
     packages = list(
-      list(package = "argparse", pip = FALSE),
-      list(package = "multiprocessing", pip = TRUE),
       list(package = "opencv-python", pip = FALSE),
       list(package = "exif", pip = FALSE),
       list(package = "pandas", pip = FALSE),

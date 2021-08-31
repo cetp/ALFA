@@ -19,6 +19,7 @@
 }
 
 
+
 # .onAttach <- function(libname, pkgname) {
 #   pv <- function(){
 #     V3 <- suppressWarnings(try(system2("python3", "--version", stdout = TRUE), silent = TRUE))
