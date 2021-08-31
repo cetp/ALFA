@@ -12,7 +12,7 @@
 ## OR, ALTERNATIVELY, TRY THIS:
 .onLoad <- function(libname, pkgname) {
   reticulate::conda_create('ALFA')
-  reticulate::configure_environment("ALFA")
+  reticulate::configure_environment(pkgname)
   reticulate::use_condaenv("ALFA")
   ALFA <- reticulate::source_python("inst/ALFA.py")
   

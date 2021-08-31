@@ -18,11 +18,13 @@ Config/reticulate:
       list(package = "opencv-python", pip = FALSE),
       list(package = "exif", pip = FALSE),
       list(package = "pandas", pip = FALSE),
-      list(package = "scikit-image", pip = TRUE)
+      list(package = "scikit-image", pip = TRUE),
       list(package = "piexif", pip = FALSE)
-    )
-  ) 
+    ) 
+  )
 License: MIT + file LICENSE
 SystemRequirements: Python (>= 2.7.0)
 Encoding: UTF-8
 RoxygenNote: 7.1.1
+
+
