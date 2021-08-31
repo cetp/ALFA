@@ -10,13 +10,13 @@ from os.path import isfile, isdir, join
 import tempfile
 import csv
 import numpy as np
-import pandas as pd
 import shutil
 from pandas.core.frame import DataFrame
 from skimage import measure
 import piexif
 import exif as ef
 import cv2
+import pandas as pd
 
 class ALFA:
     """Calculate leaf area."""
