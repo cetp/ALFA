@@ -1,31 +1,35 @@
 # global reference to each python package (will be initialized in .onLoad)
-.onLoad <- function(libname, pkgname) {
-  reticulate::py_install(c("piexif", "pandas"),  pip = FALSE) 
-  reticulate::py_install(c("scikit-image", "opencv-python", "exif"),  pip = TRUE)
-  #  reticulate::use_condaenv("ALFA")
-  ALFA <- reticulate::source_python("inst/ALFA.py")
-}
-
-##  this is another method to try to forse use of conda. 
 # .onLoad <- function(libname, pkgname) {
-# #  reticulate::conda_create('ALFA')
-# 
-#   reticulate::conda_install(c("scipy", "piexif", "pandas"),  pip = FALSE) #envname = 'ALFA',
-#   reticulate::conda_install(c("scikit-image", "opencv-python"),  pip = TRUE)#envname = 'ALFA',
-#   
-# #  reticulate::use_condaenv("ALFA")
-#   ALFA <- reticulate::source_python("inst/ALFA.py")
-# 
-# }
-
-## OR, ALTERNATIVELY, TRY THIS:
-# .onLoad <- function(libname, pkgname) {
-#   reticulate::conda_create('ALFA')
-#   reticulate::configure_environment('ALFA')
+#   reticulate::py_install(c("piexif", "pandas"),  pip = FALSE)
+#   reticulate::py_install(c("scikit-image", "opencv-python", "exif"),  pip = TRUE)
 #   reticulate::use_condaenv("ALFA")
-#   ALFA <- reticulate::source_python("inst/ALFA.py")
-#   
+#  ALFA <- reticulate::source_python("inst/ALFA.py")
 # }
+
+#  this is another method to try to forse use of conda.
+#.onLoad <- function(libname, pkgname) {
+#  reticulate::conda_create('ALFA')
+
+#  reticulate::conda_install(c("scipy", "piexif", "pandas"),  pip = FALSE) #envname = 'ALFA',
+#  reticulate::conda_install(c("scikit-image", "opencv-python"),  pip = TRUE)#envname = 'ALFA',
+
+#  reticulate::use_condaenv("ALFA")
+#  ALFA <- reticulate::source_python("inst/ALFA.py")
+
+#}
+
+# OR, ALTERNATIVELY, TRY THIS:
+.onAttach <- function(libname, pkgname) {
+  my_python = reticulate::conda_create('ALFA')
+  reticulate::configure_environment('ALFA')
+  reticulate::use_condaenv("ALFA")
+  reticulate::conda_install(envname = 'ALFA',c("numpy","piexif", "pandas"),  pip = FALSE)
+  reticulate::conda_install(envname = 'ALFA', c("scikit-image", "opencv-python", "exif"),  pip = TRUE)
+
+
+  ALFA <- reticulate::source_python("inst/ALFA.py")
+
+}
 
 
 
@@ -66,7 +70,7 @@
 #       }
 #     }
 #   }
-#   
+#
 #   version <- pv()
 #   if(length(version) == 1){packageStartupMessage("Python >= 3.5 is present")}
 #   python_location <- ifelse(.Platform$OS.type == "windows", system2(command =  "where", args = version, stdout = TRUE), system2(command = "which", args = version, stdout = TRUE))
